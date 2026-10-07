@@ -412,6 +412,10 @@ body.railmini .panel.wide{width:min(1320px, calc(100vw - var(--rail-mini) - 24px
 .signcard .fields{grid-template-columns:1fr}
 .signcard .btn{width:100%;justify-content:center;margin-top:16px}
 .formerr{margin-top:12px;font-size:12.8px;color:var(--bad);font-weight:600}
+
+/* signed-in account button: squared like the rest of the header (matches Team HQ) */
+#rs-account{flex:0 0 auto;display:inline-flex;align-items:center}
+#rs-account .rs-who,#rs-account .rs-signin{border-radius:4px}
 </style>
 <script>
 (function(){ try{ var s=localStorage.getItem("mismo.portal.theme"); if(s) document.documentElement.setAttribute("data-theme", s); }catch(e){}
