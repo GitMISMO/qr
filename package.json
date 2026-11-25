@@ -1,0 +1,11 @@
+{
+  "name": "qr",
+  "private": true,
+  "description": "QR Code Manager: the checks (npm test)",
+  "scripts": {
+    "test": "node tests/run.js"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

@@ -430,6 +430,8 @@ body.railmini .panel.wide{width:min(1320px, calc(100vw - var(--rail-mini) - 24px
   if(!scan && window.__QR_LIVE){ document.documentElement.setAttribute("data-rs-gate",""); document.write('<script src="/assets/session.js"><\/script>'); }
 })();
 </script>
+<!-- Back and Forward (CN-033): the shared helper, never a copy. On the scan page it stays idle (no menu page is marked). -->
+<script src="/assets/back.js"></script>
 </head>
 <body class="bare">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197
@@ -504,7 +506,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <div class="railhits" id="rail-hits" hidden></div>
   </div>
   <nav aria-label="QR Code Manager">
-    <button type="button" data-hq="overview" aria-current="page" title="Overview"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Overview</span></button>
+    <button type="button" data-hq="overview" title="Overview"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Overview</span></button>
     <button type="button" data-hq="codes" title="All Codes"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg><span>All Codes</span></button>
     <button type="button" data-hq="new" title="New Code"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span>New Code</span></button>
     <button type="button" data-hq="scans" title="Scan Activity"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Scan Activity</span></button>
@@ -1311,13 +1313,13 @@ function wireCode(id){
 
 /* ── the panel ── */
 const P={stack:[]};
-function openPanel(title,body,after){ P.stack.push({title,body,after}); renderPanel(); $('#panel').classList.add('on'); $('#pscrim').classList.add('on'); }
+function openPanel(title,body,after){ P.stack.push({title,body,after}); renderPanel(); $('#panel').classList.add('on'); $('#pscrim').classList.add('on'); if(window.MismoBack) MismoBack.check(); }
 function renderPanel(){ const top=P.stack[P.stack.length-1]; if(!top) return;
   $('#panel-title').textContent=typeof top.title==='function'?top.title():top.title;
   $('#panel-back').hidden=P.stack.length<2;
   const b=$('#panel-body'), nb=b.cloneNode(false); b.parentNode.replaceChild(nb,b);
   nb.innerHTML=top.body(); nb.scrollTop=0; if(top.after) top.after(); }
-function closePanel(){ P.stack=[]; S.justMade=null; $('#panel').classList.remove('on'); $('#pscrim').classList.remove('on'); render(); }
+function closePanel(){ P.stack=[]; S.justMade=null; $('#panel').classList.remove('on'); $('#pscrim').classList.remove('on'); render(); if(window.MismoBack) MismoBack.check(); }
 $('#panel-x').addEventListener('click',closePanel);
 $('#pscrim').addEventListener('click',closePanel);
 $('#panel-back').addEventListener('click',()=>{ P.stack.pop(); S.justMade=null; renderPanel(); });
@@ -1462,6 +1464,16 @@ function staleNotice(){
   document.addEventListener('click',e=>{ if(!e.target.closest('.railfind')) close(); });
   let off=null; const v=store.get(KEY); if(v!==null) off=(v==='1'); if(off===null) off=window.matchMedia('(max-width:900px)').matches; set(off,false);
 })();
+
+/* ── the browser's Back button (CN-033, the shared /assets/back.js) ──
+   Each page picked from the left menu is a step in the browser's history; Back first closes
+   what's open, top layer first: the code panel, then (on a narrow screen) the menu drawer.
+   Each close is exactly what its own X does. Registered bottom layer first. */
+if(window.MismoBack){
+  MismoBack.layer({ isOpen:()=>!!S.user && window.matchMedia('(max-width:900px)').matches && !document.body.classList.contains('railmini'),
+                    close:()=>$('#rail-scrim').click() });
+  MismoBack.layer({ isOpen:()=>$('#panel').classList.contains('on'), close:()=>closePanel() });
+}
 
 /* ── theme toggle (shared across MISMO pages) ── */
 (function theme(){
