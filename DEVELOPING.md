@@ -25,3 +25,11 @@ Back button (below). The same checks run in GitHub Actions on every push (`.gith
 - Layers Back closes, registered bottom first next to the rail code: the menu drawer on a narrow
   screen (closes like a click on its scrim), then the code panel (`closePanel()`, the same as its X).
   A new panel, pop-up or drawer must be registered there too, with `MismoBack.layer({ isOpen, close })`.
+
+## The masthead (CN-053)
+
+- It is Certification Management's masthead, to the pixel: a 68px navy bar (`--hq-h`), padding `0 22px`, 14px gaps,
+  logo box `9px 13px` with 5px corners, logo 24px tall, a 1px divider 42px tall, the name at 16px / 500 / `#94c8e9`.
+  At 560px and under it shrinks exactly as Certification Management's does (a 55px bar). The left menu and the
+  scan page take their top from `--hq-h`, so change the height there only.
+- No December hat in this page: the shared `/assets/holiday.js` (loaded by session.js) draws it.
